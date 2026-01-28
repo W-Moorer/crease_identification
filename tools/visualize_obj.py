@@ -72,7 +72,7 @@ def visualize_mesh_simple(mesh, output_path=None, title=None):
     ax.set_zlabel('Z', fontsize=11)
     
     if output_path:
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(output_path, dpi=600, bbox_inches='tight')
         print(f"Saved visualization to {output_path}")
     else:
         plt.show()
@@ -140,7 +140,7 @@ def visualize_mesh_4view(mesh, output_path=None, title=None):
         fig.suptitle('Mesh Visualization - 4 Views', fontsize=14, fontweight='bold')
     
     if output_path:
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(output_path, dpi=600, bbox_inches='tight')
         print(f"Saved 4-view visualization to {output_path}")
     else:
         plt.show()
@@ -203,7 +203,7 @@ def visualize_mesh_with_edges(mesh, output_path=None, title=None, edge_color='re
     ax.set_zlabel('Z', fontsize=11)
     
     if output_path:
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(output_path, dpi=600, bbox_inches='tight')
         print(f"Saved visualization to {output_path}")
     else:
         plt.show()

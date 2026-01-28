@@ -89,6 +89,10 @@ def process_single_mesh(mesh, theta0_deg, output_dir, figures_dir, mesh_name):
     regions_path = os.path.join(mesh_output_dir, f"{mesh_name}_regions.csv")
     export_regions(regions, mesh.faces, regions_path)
     
+    # 8. Export each region as separate OBJ file
+    print("Exporting regions as separate OBJ files...")
+    export_regions_as_obj(mesh, regions, mesh_output_dir, mesh_name)
+    
     print(f"\nData outputs saved to: {mesh_output_dir}")
     print(f"Figure outputs saved to: {mesh_figures_dir}")
     return {
@@ -254,7 +258,7 @@ def create_dihedral_heatmap(mesh, dihedral_angles, sharp_edges, output_path, the
     ax.set_zlabel('Z', fontsize=11)
     
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=600, bbox_inches='tight')
     plt.close()
     print(f"  Saved heatmap to {output_path}")
 
@@ -386,7 +390,7 @@ def create_dihedral_heatmap_4view(mesh, dihedral_angles, sharp_edges, output_pat
     cbar.ax.axhline(theta0_deg / 360.0, color='black', linestyle='--', linewidth=2,
                     label=f'Threshold ({theta0_deg}°)')
     
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=600, bbox_inches='tight')
     plt.close()
     print(f"  Saved 4-view heatmap to {output_path}")
 
@@ -445,7 +449,7 @@ Median angle: {stats['dihedral_angle_median']:.1f}°"""
     ax.legend()
     
     plt.tight_layout()
-    plt.savefig(plot_path, dpi=150)
+    plt.savefig(plot_path, dpi=600)
     plt.close()
     print(f"  Saved histogram to {plot_path}")
 
@@ -474,6 +478,37 @@ def export_regions(regions, faces, output_path):
                 writer.writerow([region_id, face_idx, face[0], face[1], face[2]])
     
     print(f"  Saved region information to {output_path}")
+
+
+def export_regions_as_obj(mesh, regions, output_dir, mesh_name):
+    """
+    将每个光滑区域导出为独立的OBJ文件。
+    
+    Args:
+        mesh: Trimesh对象
+        regions: 区域列表，每个区域包含面索引列表
+        output_dir: 输出目录
+        mesh_name: 原始网格名称
+    """
+    # 创建regions子文件夹
+    regions_dir = os.path.join(output_dir, 'regions')
+    os.makedirs(regions_dir, exist_ok=True)
+    
+    print(f"  Exporting {len(regions)} regions to {regions_dir}...")
+    
+    for region_id, face_indices in enumerate(regions):
+        # 提取子网格
+        submesh = mesh.submesh([face_indices], append=True)
+        
+        # 构建输出路径
+        region_filename = f"{mesh_name}_region_{region_id:03d}.obj"
+        region_path = os.path.join(regions_dir, region_filename)
+        
+        # 导出为OBJ
+        submesh.export(region_path)
+        print(f"    Region {region_id}: {len(face_indices)} faces -> {region_filename}")
+    
+    print(f"  Saved {len(regions)} region OBJ files to {regions_dir}")
 
 def main():
     parser = argparse.ArgumentParser(
