@@ -12,6 +12,7 @@
   - 二面角热力图（3D彩色编码）
   - 二面角热力图四视图（正视图、俯视图、侧视图、等轴测视图）
   - 二面角分布直方图
+  - **Region 区域可视化**：每个光滑区域独立生成 PNG 图片，直观展示区域位置
 - ✅ **Times New Roman字体**：所有图表使用Times New Roman字体
 - ✅ **结构化数据导出**：
   - 尖锐边信息（CSV）
@@ -70,6 +71,44 @@ python scripts/crease_identification.py --input <OBJ文件或目录> [选项]
    python scripts/crease_identification.py --input assets/complex_geometry/Gear.obj --threshold 60.0
    ```
 
+### Regions 可视化工具
+
+可视化各个光滑区域的位置，每个区域生成独立的 PNG 图片。
+
+#### 基本命令
+```bash
+python tools/visualize_regions.py --input <OBJ文件> [选项]
+```
+
+#### 命令行参数
+| 参数 | 简写 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--input` | `-i` | **必需** | 输入OBJ文件路径 |
+| `--regions` | `-r` | `自动查找` | regions CSV文件路径（可选，默认自动从output/查找） |
+| `--output-dir` | `-d` | `output` | 包含处理结果的输出目录 |
+| `--figures` | `-f` | `figures` | 图片输出目录 |
+| `--mode` | `-m` | `simple` | 可视化模式：`simple`（单视图）或 `4view`（四视图） |
+| `--no-edges` | - | `False` | 不显示区域边界边 |
+
+#### 示例
+
+1. **自动生成所有区域的单视图**：
+   ```bash
+   python tools/visualize_regions.py -i models/Cube.obj
+   ```
+   自动读取 `output/Cube/Cube_regions.csv`，输出到 `figures/Cube/regions/`
+
+2. **生成四视图**：
+   ```bash
+   python tools/visualize_regions.py -i models/Gear.obj -m 4view
+   ```
+   每个区域生成包含正视图、俯视图、侧视图、等轴测视图的图片
+
+3. **不显示边界边**：
+   ```bash
+   python tools/visualize_regions.py -i models/Cube.obj --no-edges
+   ```
+
 ## 项目结构
 ```
 crease_identification/
@@ -91,7 +130,8 @@ crease_identification/
 ├── scripts/                   # 应用脚本
 │   └── crease_identification.py  # 主程序
 ├── tools/                     # 工具脚本
-│   └── visualize_obj.py       # OBJ模型可视化工具
+│   ├── visualize_obj.py       # OBJ模型可视化工具
+│   └── visualize_regions.py   # Regions区域可视化工具
 ├── output/                    # 数据输出目录（自动生成）
 ├── figures/                   # 图片输出目录（自动生成）
 ├── temps/                     # 参考代码（区域划分算法来源）
@@ -145,6 +185,19 @@ crease_identification/
   - 显示所有内部边的角度分布
   - 红色虚线标记阈值
   - 使用Times New Roman字体
+
+### 3. Regions 可视化文件 (`figures/<mesh_name>/regions/`)
+运行 `visualize_regions.py` 后生成：
+- `<mesh_name>_region_000.png`：Region 0 的可视化
+  - 以浅色线框显示完整模型作为背景参考
+  - Region 面片使用 tab20 颜色映射高亮显示
+  - 红色粗线标记区域边界边
+  - 自动以 region 为中心调整视角范围
+- `<mesh_name>_region_001.png`：Region 1 的可视化
+- ...（每个 region 对应一个 PNG 文件）
+
+使用 `--mode 4view` 时生成四视图版本：
+- `<mesh_name>_region_000_4view.png`：包含正视图、俯视图、侧视图、等轴测视图
 
 ## 示例输出
 
