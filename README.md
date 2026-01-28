@@ -10,7 +10,9 @@
 - ✅ **光滑区域划分**：使用广度优先搜索（BFS）算法划分连接的光滑面区域
 - ✅ **丰富的可视化输出**：
   - 二面角热力图（3D彩色编码）
+  - 二面角热力图四视图（正视图、俯视图、侧视图、等轴测视图）
   - 二面角分布直方图
+- ✅ **Times New Roman字体**：所有图表使用Times New Roman字体
 - ✅ **结构化数据导出**：
   - 尖锐边信息（CSV）
   - 区域划分信息（CSV）
@@ -77,9 +79,7 @@ crease_identification/
 │   ├── complex_geometry/      # 复杂几何体（齿轮、凸轮等）
 │   └── combinatorial_geometry/# 组合几何体
 ├── packages/                  # 核心算法模块
-│   └── topology/
-│       ├── __init__.py
-│       └── preprocessing.py   # 网格预处理、尖锐边检测、区域划分
+│   └── preprocessing.py       # 网格预处理、尖锐边检测、区域划分
 ├── scripts/                   # 应用脚本
 │   └── crease_identification.py  # 主程序
 ├── output/                    # 数据输出目录（自动生成）
@@ -93,10 +93,12 @@ crease_identification/
 ## 算法原理
 
 ### 1. 二面角计算
-对于每条由两个相邻三角面共享的内部边，计算两个面法向量之间的夹角：
+对于每条边，计算其二面角：
+- **内部边**（两个相邻面）：计算两个面法向量之间的夹角，范围为 0°~180°
+- **边界边**（一个相邻面）：计算外角，固定为 270°（代表如立方体边缘的90°拐角）
 - 计算每个面的法向量（叉积归一化）
 - 计算点积并反余弦得到弧度值
-- 转换为角度（0°~180°）
+- 转换为角度（0°~360°）
 
 ### 2. 尖锐边检测
 - **内部边**：如果二面角 ≥ 阈值，标记为尖锐边
@@ -121,22 +123,30 @@ crease_identification/
 
 ### 2. 可视化文件 (`figures/<mesh_name>/`)
 - `<mesh_name>_dihedral_heatmap.png`：二面角热力图
-  - 蓝色→绿色→红色表示角度由小到大
+  - 蓝色→绿色→红色表示角度由小到大（0°~360°）
   - 尖锐边以粗线高亮显示
   - 保持等轴比例，准确呈现几何形状
+  - 使用Times New Roman字体
+- `<mesh_name>_dihedral_heatmap_4view.png`：二面角热力图四视图
+  - 包含正视图、俯视图、侧视图、等轴测视图
+  - 统一的颜色条和比例
+  - 使用Times New Roman字体
 - `<mesh_name>_dihedral_histogram.png`：二面角分布直方图
   - 显示所有内部边的角度分布
   - 红色虚线标记阈值
+  - 使用Times New Roman字体
 
 ## 示例输出
 
 ### 热力图特点：
 - **尖锐边清晰可见**：使用粗线（3.0px）和完全透明度突出显示
 - **等轴显示**：保持模型真实比例，无扭曲
-- **颜色编码**：
+- **颜色编码**（0°~360°）：
   - 蓝色（0°）：完全共面的相邻面
-  - 绿色（90°）：垂直的相邻面
-  - 红色（180°）：尖锐边界边或最大角度
+  - 绿色（~180°）：垂直的相邻面
+  - 橙色（270°）：立方体等90°拐角边界边
+  - 红色（360°）：最大角度
+- **Times New Roman字体**：所有标签和标题使用Times New Roman字体
 
 ### 立方体示例（阈值=45°）：
 ```
@@ -158,7 +168,7 @@ Partitioning smooth regions...
 - **较大阈值**（如60°）：仅检测明显折痕
 
 ### 添加新算法
-1. 在 `packages/topology/` 中添加新模块
+1. 在 `packages/` 中添加新模块
 2. 在 `preprocessing.py` 中集成新函数
 3. 在 `crease_identification.py` 中调用
 
@@ -180,7 +190,6 @@ Partitioning smooth regions...
 
 ## 致谢
 
-- 区域划分算法基于 `temps/` 目录中的参考实现
 - 使用 [trimesh](https://github.com/mikedh/trimesh) 进行网格处理
 - 使用 [Matplotlib](https://matplotlib.org/) 进行可视化
 

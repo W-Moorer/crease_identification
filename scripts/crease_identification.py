@@ -23,7 +23,7 @@ plt.rcParams['axes.unicode_minus'] = False
 # Add project root to path to import packages
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from packages.topology.preprocessing import (
+from packages.preprocessing import (
     compute_dihedral_angles,
     detect_sharp_edges,
     segment_smooth_regions,
